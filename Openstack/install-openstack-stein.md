@@ -2,6 +2,7 @@
 ### Thiết lập Hostname
 hostnamectl set-hostname compute2
 ### Thiết lập IP
+```sh
 echo "Setup IP  eth0"
 nmcli c modify eth0 ipv4.addresses 10.10.10.13/24
 nmcli c modify eth0 ipv4.gateway 10.10.10.1
@@ -33,7 +34,7 @@ sudo systemctl enable network
 sudo systemctl start network
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
 sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
-
+```
 ### Khai báo repo và cài đặt các package cho OpenStack Stein
 
 echo '[mariadb]
