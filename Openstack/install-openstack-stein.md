@@ -1,6 +1,8 @@
 ## Cấu hình chung cho controller và compute
 ### Thiết lập Hostname
+```sh
 hostnamectl set-hostname compute2
+```
 ### Thiết lập IP
 ```sh
 echo "Setup IP  eth0"
@@ -56,7 +58,9 @@ rm -f /etc/localtime
 ln -s /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
 ```
 ### Reboot Server
+```sh
 init 6
+```
 ------------------
 ## Cấu hình NTPD
 ### Cấu hình trên node controler
@@ -145,7 +149,9 @@ systemctl enable rabbitmq-server.service
 rabbitmqctl set_user_tags openstack administrator
 ```
 ### kiểm tra user:
+```sh
 rabbitmqadmin list users
+```
 ### Đăng nhập vào Dashboard quản trị của Rabbit-mq
 ```sh
 http://10.10.10.11:15672
@@ -468,13 +474,21 @@ FLUSH PRIVILEGES;
 exit;
 ```
 #### sử dụng biến môi trường
+```sh
 source admin-openrc
+```
 #### Tạo user nova
+```sh
 openstack user create --domain default --password 123456abc nova
+```
 #### Thêm role admin cho user placement trên project service
+```sh
 openstack role add --project service --user nova admin
+```
 #### Tạo dịch vụ nova
+```sh
 openstack service create --name nova --description "OpenStack Compute" compute
+```
 #### Tạo các endpoint cho dịch vụ compute
 ```sh
 openstack endpoint create --region RegionOne compute public http://10.10.10.11:8774/v2.1
@@ -482,9 +496,13 @@ openstack endpoint create --region RegionOne compute internal http://10.10.10.11
 openstack endpoint create --region RegionOne compute admin http://10.10.10.11:8774/v2.1
 ```
 #### Tạo user placement
+```sh
 openstack user create --domain default --password 123456abc placement
+```
 #### Thêm role admin cho user placement trên project service
+```sh
 openstack role add --project service --user placement admin
+```
 #### Tạo dịch vụ placement
 ```sh
 openstack service create --name placement --description "Placement API" placement
@@ -645,7 +663,9 @@ sed -i -e 's/VirtualHost \*/VirtualHost 10.10.10.11/g' /etc/httpd/conf.d/00-nova
 sed -i -e 's/Listen 8778/Listen 10.10.10.11:8778/g' /etc/httpd/conf.d/00-nova-placement-api.conf
 ```
 #### 
+```sh
 systemctl restart httpd 
+```
 #### Import DB nova
 ```sh
 su -s /bin/sh -c "nova-manage api_db sync" nova
@@ -654,7 +674,9 @@ su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova
 su -s /bin/sh -c "nova-manage db sync" nova
 ```
 #### Check nova cell
+```sh
 nova-manage cell_v2 list_cells
+```
 #### Enable và start service nova
 ```sh
 systemctl enable openstack-nova-api.service openstack-nova-consoleauth.service \
@@ -665,12 +687,17 @@ openstack-nova-scheduler.service openstack-nova-conductor.service \
 openstack-nova-novncproxy.service
 ```
 #### Kiểm tra cài đặt lại dịch vụ
+```sh
 openstack compute service list
-
+```
 ## Cấu hình trên Node Compute1
+```sh
 yum install -y openstack-nova-compute libvirt-client
+```
 ### Backup cấu hình nova
+```sh
 mv /etc/nova/nova.{conf,conf.bk}
+```
 ### Cấu hình Nova
 ```sh
 cat << EOF >> /etc/nova/nova.conf 
@@ -775,13 +802,19 @@ novncproxy_base_url = http://10.10.10.11:6080/vnc_auto.html
 EOF
 ```
 ### Phân quyền lại file config
+```sh
 chown root:nova /etc/nova/nova.conf
+```
 ### Enable và start service
+```sh
 systemctl enable libvirtd.service openstack-nova-compute.service
 systemctl start libvirtd.service openstack-nova-compute.service
+```
 ## Kiểm tra trên Controller
+```sh
 source admin-openrc
 openstack compute service list
+```
 # Cài đặt Neutron (Service Network)
 ## Cấu hình trên Node Controller
 ```sh
@@ -806,7 +839,9 @@ openstack endpoint create --region RegionOne network internal http://10.10.10.11
 openstack endpoint create --region RegionOne network admin http://10.10.10.11:9696
 ```
 ### Cài đặt cấu hình neutron
+```sh
 yum install openstack-neutron openstack-neutron-ml2 openstack-neutron-linuxbridge ebtables -y
+```
 #### Cấu hình
 ```sh
 mv /etc/neutron/neutron.{conf,conf.bk}
@@ -866,7 +901,9 @@ rabbit_ha_queues = true
 EOF
 ```
 #### phân quyền
+```sh
 chown root:neutron /etc/neutron/neutron.conf
+```
 #### Cấu hình ml2_config
 ```sh
 mv /etc/neutron/plugins/ml2/ml2_conf.{ini,ini.bk}
@@ -893,7 +930,9 @@ enable_ipset = true
 EOF
 ```
 #### phân quyền
+```sh
 chown root:neutron /etc/neutron/plugins/ml2/ml2_conf.ini
+```
 #### Cấu hình linuxbridge_agent
 ```sh
 mv /etc/neutron/plugins/ml2/linuxbridge_agent.{ini,init.bk}
@@ -915,7 +954,9 @@ local_ip = 10.10.12.11
 EOF
 ```
 #### phân quyền
+```sh
 chown root:neutron /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+```
 #### Cấu hình trên file l3_agent
 ```sh
 mv /etc/neutron/l3_agent.{ini,ini.bk}
@@ -947,7 +988,9 @@ region_name = RegionOne
 ```
 #### Các Networking service initialization script yêu cầu symbolic link /etc/neutron/plugin.ini tới ML2 plug-in config file /etc/neutron/plugins/ml2/ml2_conf.ini
 #### Khởi tạo symlink cho ml2_config
+```sh
 ln -s /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini
+```
 #### Đồng bộ database
 ```sh
 su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
@@ -1051,7 +1094,9 @@ metadata_proxy_shared_secret = 123456abc
 [cache]
 EOF
 ```
+```sh
 chown root:neutron /etc/neutron/metadata_agent.ini
+```
 #### Bổ sung cấu hình phần [neutron] trong /etc/nova/nova.conf
 ```sh
 [neutron]
@@ -1114,8 +1159,9 @@ systemctl start lvm2-lvmetad.service
 ```
 ### chờ cấu hình connect ceph
 ## Cài đặt Horizon (Service Dashboard) (Chỉ cấu hình trên Node Controller)
+```sh
 yum install -y openstack-dashboard
-
+```
 ### tạo file redrect
 ```sh
 filehtml=/var/www/html/index.html
@@ -1171,9 +1217,11 @@ echo "WSGIApplicationGroup %{GLOBAL}" >> /etc/httpd/conf.d/openstack-dashboard.c
 systemctl restart httpd.service memcached.service
 ```
 ### Hoàn tất cài đặt truy cập Dashboard
+```sh
 http://10.10.10.11
 user: admin
 password: 123456abc
+```
 ### Tạo network
 ### Truy cập Admin --> Network --> Networks Chọn Create Network
 Name: provider
