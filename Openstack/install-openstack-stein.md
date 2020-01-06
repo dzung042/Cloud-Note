@@ -47,7 +47,7 @@ gpgcheck=1' >> /etc/yum.repos.d/MariaDB.repo
 
 yum install -y epel-release
 yum update -y
-yum install -y centos-release-openstack-queens \
+yum install -y centos-release-openstack-stein \
    open-vm-tools python2-PyMySQL vim telnet wget curl 
 yum install -y python-openstackclient openstack-selinux 
 yum upgrade -y
